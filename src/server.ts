@@ -1,9 +1,10 @@
 import express, { NextFunction, Request, Response } from "express";
 import bodyParser from "body-parser";
-import client from "./database"
-interface Error {
+import {usersRoutes} from "./handlers/user.handler";
+import {UserModel} from "./models/user.model";
+export interface Error {
   name: string;
-  massage: string;
+  message: string;
   stack?: string;
   status: number;
 }
@@ -14,16 +15,15 @@ const address: string = "0.0.0.0:3000";
 app.use(bodyParser.json());
 
 app.get("/",async function (req: Request, res: Response) {
-  const connection = await client.connect();
-  const query = "SELECT NOW()"
-  const resuelt = connection.query(query);
-  connection.release;
-  res.json(resuelt);
+  res.json("hello");
 });
+
+usersRoutes(app);
 
 app.listen(3000, function (): void {
   console.log("server is running on " + address);
 });
+
 
 app.use(
   (
@@ -32,8 +32,7 @@ app.use(
     res: express.Response,
     next: NextFunction
   ): void => {
-    const status = err.status || 500;
-    console.log(err.massage);
-    res.status(status).json(err.name || "oops there is a problem");
+    const status = err.status||500;
+    res.status(status).json(err.message);
   }
 );
