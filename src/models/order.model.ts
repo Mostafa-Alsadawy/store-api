@@ -53,7 +53,7 @@ export class OrderModel {
       if (inDB.rowCount <= 0) {
         throw new Error("this is item does not exist");
       }
-      const sql = "DELETE FROM orders WHERE id = $1 RETUENING *;";
+      const sql = "DELETE FROM orders WHERE id = $1 RETURNING *;";
       const result = await connection.query(sql, [id]);
       return result.rows[0];
     } catch (error) {
@@ -67,7 +67,7 @@ export class OrderModel {
     try {
       const connenction = await client.connect();
       const sql =
-        "INSERT INTO orders (stat,user_id) VALUES($1,$2) RETUENING *;";
+        "INSERT INTO orders (stat,user_id) VALUES($1,$2) RETURNING *;";
       const result = await connenction.query(sql, [order.stat, order.userId]);
       connenction.release();
       return result.rows[0];
@@ -91,7 +91,7 @@ export class OrderModel {
       }
 
       const sql =
-        "UPDATE  orders SET (stat,user_id) VALUES($1,$2) RETUENING *;";
+        "UPDATE  orders SET (stat,user_id) VALUES($1,$2) RETURNING *;";
       const result = await connenction.query(sql, [order.stat, order.userId]);
       connenction.release();
       return result.rows[0];
@@ -105,7 +105,7 @@ export class OrderModel {
     try {
       const connection = await client.connect();
       const sql =
-        "INSERT INTO order_products (quantity,user_id,product_id) VALUES ($1,$2,$3) RETUENING*;";
+        "INSERT INTO order_products (quantity,user_id,product_id) VALUES ($1,$2,$3) RETURNING*;";
       const result = await connection.query(sql, [
         OrderProduct.quantity,
         OrderProduct.orderId,

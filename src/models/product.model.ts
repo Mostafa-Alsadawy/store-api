@@ -27,6 +27,7 @@ export class ProductModel {
       const sql = "SELECT * FROM products WHERE id = $1;";
       const result = await connection.query(sql, [productId]);
       connection.release();
+      if(result.rowCount <= 0){throw new Error("this product does not exist.");}
       return result.rows[0];
     } catch (err) {
       throw new Error((err as Error).message);
@@ -41,6 +42,7 @@ export class ProductModel {
       const sql = "DELETE FROM products WHERE id=$1 RETURNING *;";
       const result = await connection.query(sql, [productId]);
       connection.release();
+      if(result.rowCount <= 0){throw new Error("this product does not exist.");}
       return result.rows[0];
     } catch (err) {
       throw new Error((err as Error).message);
@@ -52,8 +54,8 @@ export class ProductModel {
     try {
       const connection = await client.connect();
       const sql =
-        "INSERT  INTO products (name,price) VALUES ($1,$2) RETUENING *;";
-      const result = await connection.query(sql);
+        "INSERT  INTO products (name,price) VALUES ($1,$2) RETURNING *;";
+      const result = await connection.query(sql,[product.name,product.price]);
       connection.release();
       return result.rows[0];
     } catch (err) {
@@ -69,7 +71,7 @@ export class ProductModel {
           const inDB = await connection.query("SELECT id from products WHERE id = $1;",[product.id]);
           if (inDB.rowCount <=0) {throw new Error("this product does not exist");}
         
-          const sql = "UPDATE products SET(name,price) = ($1,$2) WHERE id = $3 RETUENING *;";
+          const sql = "UPDATE products SET(name,price) = ($1,$2) WHERE id = $3 RETURNING *;";
           const result = await connection.query(sql,[product.name,product.price,product.id]);
           return result.rows[0];
         }

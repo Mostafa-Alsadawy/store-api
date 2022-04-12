@@ -1,9 +1,10 @@
 import { UserModel, User } from "../models/user.model";
 import express, { NextFunction } from "express";
+import { body, check, validationResult } from "express-validator";
 
 const userModel = new UserModel();
 
-export const usersRoutes = (app: express.Application):void => {
+export const usersRoutes = (app: express.Application): void => {
   app.get(
     "/users",
     async (
@@ -49,8 +50,18 @@ export const usersRoutes = (app: express.Application):void => {
   );
 
   app.post(
-    "/users/create",
-    async (req: express.Request, res: express.Response, next: NextFunction) => {
+    "/users/add-user",
+    body("firstName").isLength({ min: 5 }),
+    body("lastName").isLength({ min: 5 }),
+    body("password").isLength({ min: 5 }),
+    async (req: express.Request, res: express.Response, next: NextFunction):Promise<express.Response|void> => {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          status: "faild",
+          message: "bad request " + errors.toString(),
+        });
+      }
       try {
         const result = await userModel.create(req.body);
         res.json(result);
@@ -83,7 +94,17 @@ export const usersRoutes = (app: express.Application):void => {
 
   app.put(
     "/users/:id",
-    async (req: express.Request, res: express.Response, next: NextFunction) => {
+    body("firstName").isLength({ min: 5 }),
+    body("lastName").isLength({ min: 5 }),
+    body("password").isLength({ min: 5 }),
+    async (req: express.Request, res: express.Response, next: NextFunction):Promise<express.Response|void> => {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          status: "faild",
+          message: "bad request " + errors.toString(),
+        });
+      }
       try {
         const id = req.params.id;
         req.body.id = id;
@@ -94,4 +115,6 @@ export const usersRoutes = (app: express.Application):void => {
       }
     }
   );
+
+  //authenticate user
 };

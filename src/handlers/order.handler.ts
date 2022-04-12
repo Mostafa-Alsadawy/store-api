@@ -1,9 +1,9 @@
 import  express, { NextFunction }  from "express";
 import {Order, OrderModel} from "../models/order.model"
-
+import { body,check } from "express-validator";
 const  orderModel = new OrderModel();
 
-const ordersRouts = (app:express.Application)=>{
+export const ordersRouts = (app:express.Application)=>{
 
     // Route to list all Orders 
     app.get("/orders",async(_req:express.Request,res:express.Response,next:NextFunction):Promise<void>=>{

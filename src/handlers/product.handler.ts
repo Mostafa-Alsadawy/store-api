@@ -1,9 +1,10 @@
 import expres, { NextFunction } from "express";
 import {ProductModel, Product } from "../models/product.model";
+import { body,check } from "express-validator";
 
 const productModel = new ProductModel();
 
-const productsRouts = (app:expres.Application):void=>{
+export const productsRouts = (app:expres.Application):void=>{
     // get all product route (index)
     app.get("/products",async(_req:expres.Request,res:expres.Response,next:NextFunction):Promise<void>=>{
         try {
@@ -48,9 +49,9 @@ const productsRouts = (app:expres.Application):void=>{
     });
 
     // Create new product 
-    app.post("/products/create",async (req:expres.Request,res:expres.Response,next:NextFunction):Promise<void>=>{
+    app.post("/products/add-product",async (req:expres.Request,res:expres.Response,next:NextFunction):Promise<void>=>{
         try {
-            const result = productModel.create(req.body);
+            const result = await productModel.create(req.body);
             res.json({
                 status:"success",
                 message:"done create new product",
