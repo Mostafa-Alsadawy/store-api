@@ -7,10 +7,13 @@ These are the notes from a meeting with the frontend developer that describe wha
 #### Products
 - Index 
     "products\" [GET]
+    returns list of all existed products
 - Show
     "products\id:\" [GET]
+    retuern single product by giving its id.
+    note: if product with given id not exist will retuen bad request error.
 - Create [token required]
-    "add-product\:token" [POST]
+    "add-product" [POST]
 - [OPTIONAL] Top 5 most popular products 
 - [OPTIONAL] Products by category (args: product category)
 
@@ -26,21 +29,25 @@ These are the notes from a meeting with the frontend developer that describe wha
 
 ## Data Shapes
 #### Product
--  id
-- name
-- price
+-  id serial primary key
+- name varchar(100) not null
+- price money not null
 - [OPTIONAL] category
 
 #### User
-- id
-- firstName
-- lastName
-- password
+- id serial primary key
+- firstName varchar(100) not null
+- lastName varchar(100) not null
+- password text not null
 
 #### Orders
-- id
-- id of each product in the order
-- quantity of each product in the order
-- user_id
-- status of order (active or complete)
+- id serial primary key
+- user_id integer refrence user(id)
+- status of order (active or complete) varchar(50)
 
+
+#### Order-Products
+- id serial primary key
+- id of each order integer refrence order_id
+- id of each product in the order integer refrence product_id
+- quantity of each product in the order integer not null

@@ -13,7 +13,7 @@ const errorThrower = ()=>{
 
 
 // this code snappit it taken from udacitu classroom lesson 5 chapter 10 with some modifcations
-const verifyAuthToken = (
+ const verifyAuthToken = (
   req: express.Request,
   res: express.Response,
   next: NextFunction
@@ -22,9 +22,9 @@ const verifyAuthToken = (
     const authorizationHeader = req.headers.authorization;
     if (authorizationHeader) {
       const token = authorizationHeader.split(" ")[1];
-      const bearer = authorizationHeader.split(" ")[0];
-      if (token && bearer === "bearer") {
-        const decoded = jwt.verify(token, process.env.TOKEN_SECRET!);
+    //   const bearer = authorizationHeader.split(" ")[0];
+      if (token) {
+        const decoded = jwt.verify(token, process.env.TOKEN_SECRET as string);
         if (decoded) {
           next();
         } else {
@@ -40,3 +40,5 @@ const verifyAuthToken = (
     throw new Error((error as Error).message);
   }
 };
+
+export default verifyAuthToken;

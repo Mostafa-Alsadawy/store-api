@@ -105,7 +105,7 @@ export class OrderModel {
     try {
       const connection = await client.connect();
       const sql =
-        "INSERT INTO order_products (quantity,user_id,product_id) VALUES ($1,$2,$3) RETURNING*;";
+        "INSERT INTO order_products (quantity,order_id,product_id) VALUES ($1,$2,$3) RETURNING*;";
       const result = await connection.query(sql, [
         OrderProduct.quantity,
         OrderProduct.orderId,

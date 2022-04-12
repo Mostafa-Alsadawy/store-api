@@ -1,12 +1,15 @@
-import { UserModel, User } from "../models/user.model";
+import { UserModel } from "../models/user.model";
 import express, { NextFunction } from "express";
-import { body, check, validationResult } from "express-validator";
+import { body, validationResult } from "express-validator";
+import jwt from "jsonwebtoken";
+import verifyAuthToken from "../middlewares/verify_auth_token";
 
 const userModel = new UserModel();
 
 export const usersRoutes = (app: express.Application): void => {
   app.get(
     "/users",
+    verifyAuthToken,
     async (
       _req: express.Request,
       res: express.Response,
@@ -27,6 +30,7 @@ export const usersRoutes = (app: express.Application): void => {
 
   app.get(
     "/users/:id",
+    verifyAuthToken,
     async (
       req: express.Request,
       res: express.Response,
@@ -54,7 +58,11 @@ export const usersRoutes = (app: express.Application): void => {
     body("firstName").isLength({ min: 5 }),
     body("lastName").isLength({ min: 5 }),
     body("password").isLength({ min: 5 }),
-    async (req: express.Request, res: express.Response, next: NextFunction):Promise<express.Response|void> => {
+    async (
+      req: express.Request,
+      res: express.Response,
+      next: NextFunction
+    ): Promise<express.Response | void> => {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return res.status(400).json({
@@ -64,7 +72,14 @@ export const usersRoutes = (app: express.Application): void => {
       }
       try {
         const result = await userModel.create(req.body);
-        res.json(result);
+        if (result) {
+          const token = jwt.sign(result, process.env.TOKEN_SECRET as string);
+          res.json({
+            status: "success",
+            massage: "created user with token",
+            data: { ...result, token },
+          });
+        }
       } catch (error) {
         next(error);
       }
@@ -73,6 +88,7 @@ export const usersRoutes = (app: express.Application): void => {
 
   app.delete(
     "/users/:id",
+    verifyAuthToken,
     async (
       req: express.Request,
       res: express.Response,
@@ -94,10 +110,15 @@ export const usersRoutes = (app: express.Application): void => {
 
   app.put(
     "/users/:id",
+    verifyAuthToken,
     body("firstName").isLength({ min: 5 }),
     body("lastName").isLength({ min: 5 }),
     body("password").isLength({ min: 5 }),
-    async (req: express.Request, res: express.Response, next: NextFunction):Promise<express.Response|void> => {
+    async (
+      req: express.Request,
+      res: express.Response,
+      next: NextFunction
+    ): Promise<express.Response | void> => {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return res.status(400).json({
@@ -117,4 +138,41 @@ export const usersRoutes = (app: express.Application): void => {
   );
 
   //authenticate user
+  app.get(
+    "/users/authenticate",
+    body("firstName").isLength({ min: 5 }),
+    body("lastName").isLength({ min: 5 }),
+    body("password").isLength({ min: 5 }),
+    async (
+      req: express.Request,
+      res: express.Response,
+      next: NextFunction
+    ): Promise<express.Response | void> => {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          status: "faild",
+          message: "bad request " + errors.toString(),
+        });
+      }
+      try {
+        const result = await userModel.authenticate(req.body);
+        if (result) {
+          const token = jwt.sign(result, process.env.TOKEN_SECRET as string);
+          res.json({
+            status: "success",
+            massage: "done authenticate user with token",
+            data: { ...result, token },
+          });
+        } else {
+          res.status(404).json({
+            status:"faild",
+            message:"bad request thir with no user with this credintials"
+          })
+        }
+      } catch (error) {
+        next(error);
+      }
+    }
+  );
 };
