@@ -3,7 +3,7 @@ import express, { NextFunction } from "express";
 
 const userModel = new UserModel();
 
-export const usersRoutes = (app: express.Application) => {
+export const usersRoutes = (app: express.Application):void => {
   app.get(
     "/users",
     async (

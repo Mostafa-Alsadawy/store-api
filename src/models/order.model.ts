@@ -1,12 +1,19 @@
 import client from "../database";
 
-type Order = {
+export type Order = {
   id?: number;
   stat: string;
   userId: number;
 };
 
-class OrderModel {
+export type OrderProduct = {
+    id?:number,
+    quantity:number,
+    orderId:number,
+    productId:number
+}
+
+export class OrderModel {
   // get all orders
 
   async index(): Promise<Order[]> {
@@ -55,5 +62,15 @@ class OrderModel {
   }
 
   // add new product to order 
-  async addProduct()
+  async addProduct(OrderProduct:OrderProduct):Promise<OrderProduct>{
+    try{
+        const connection = await client.connect();
+        const sql = "INSERT INTO order_products (quantity,user_id,product_id) VALUES ($1,$2,$3) RETUENING*;";
+        const result = await connection.query(sql,[OrderProduct.quantity,OrderProduct.orderId,OrderProduct.productId])
+        return result.rows[0];
+    }catch(err){
+        throw new Error((err as Error).message);
+    }
+
+  }
 }

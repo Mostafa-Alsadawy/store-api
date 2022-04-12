@@ -1,11 +1,11 @@
 import client from "../database";
-type Product = {
+export type Product = {
   id?: number;
   name: string;
   price: number;
 };
 
-class ProductModel {
+export class ProductModel {
   //get all products
   async index(): Promise<Product[]> {
     try {
