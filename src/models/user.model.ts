@@ -6,9 +6,9 @@ dotenv.config();
 
 export type User = {
   id?: number;
-  firstName: string;
-  lastName: string;
-  password: string;
+  firstname: string;
+  lastname: string;
+  passwd: string;
 };
 
 const hashPassword = async (password: string): Promise<string> => {
@@ -25,9 +25,9 @@ export class UserModel {
       const query =
         "INSERT INTO users (firstName,lastName,passwd) VALUES ($1,$2,$3) RETURNING *;";
       const result = await connection.query(query, [
-        user.firstName,
-        user.lastName,
-        await hashPassword(user.password),
+        user.firstname,
+        user.lastname,
+        await hashPassword(user.passwd),
       ]);
       connection.release();
       return result.rows[0];
@@ -51,11 +51,11 @@ export class UserModel {
   }
 
   // get sigle user
-  async getUser(userId: number): Promise<User> {
+  async getUser(userid: number): Promise<User> {
     try {
       const connection = await client.connect();
       const query = "SELECT * FROM users WHERE id = $1";
-      const result = await connection.query(query, [userId]);
+      const result = await connection.query(query, [userid]);
       connection.release();
       return result.rows[0];
     } catch (err) {
@@ -64,11 +64,11 @@ export class UserModel {
   }
 
   // delete single user
-  async deleteUser(userId: number): Promise<User> {
+  async deleteUser(userid: number): Promise<User> {
     try {
       const connection = await client.connect();
       const query = "DELETE FROM users WHERE id = $1 RETURNING *;";
-      const result = await connection.query(query, [userId]);
+      const result = await connection.query(query, [userid]);
       connection.release();
       if (result.rowCount <= 0) {
         throw new Error("this user does not exist.");
@@ -94,9 +94,9 @@ export class UserModel {
       const query =
         "UPDATE users SET (firstName,lastName,passwd) = ($1,$2,$3) WHERE id = $4 RETURNING *;";
       const result = await connection.query(query, [
-        user.firstName,
-        user.lastName,
-        await hashPassword(user.password),
+        user.firstname,
+        user.lastname,
+        await hashPassword(user.passwd),
         user.id,
       ]);
       connection.release();
@@ -118,7 +118,7 @@ export class UserModel {
       connection.release();
       if (
         result.rowCount == 1 &&
-        bcrypt.compareSync(user.password + process.env.PEPPER, result.rows[0])
+        bcrypt.compareSync(user.passwd + process.env.PEPPER, result.rows[0])
       ) {
         return user;
       } else {

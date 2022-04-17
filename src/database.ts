@@ -10,7 +10,7 @@ const client = new Pool({
     host:env.HOST,
     user:env.USER,
     password:env.PASSWORD,
-    database:env.DB
+    database:(env.NODE_ENV == "dev"? env.DB : env.DB_TEST)
 })
 
 export default client;

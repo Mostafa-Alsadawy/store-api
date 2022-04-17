@@ -40,6 +40,7 @@ export const ordersRouts = (app: express.Application) => {
       try {
         const id = parseInt(req.params.id);
         const result = await orderModel.show(id);
+        if(!result){throw new Error("no order exist with this id.")}
         res.json({
           status: "success",
           message: "done list one ordere with id " + id,
@@ -61,6 +62,7 @@ export const ordersRouts = (app: express.Application) => {
       next: NextFunction
     ): Promise<void> => {
       try {
+        
         const result = await orderModel.create(req.body);
         res.json({
           status: "success",
@@ -137,9 +139,18 @@ export const ordersRouts = (app: express.Application) => {
         });
       }
       try {
-        const orderId = parseInt(req.params.id);
+        let orderId = parseInt(req.params.id);
+
+        const order = await orderModel.show(orderId)
+
+        if(!order){
+            //@ts-ignore: used to avoid making custom type for request.
+            const userid:number = req.info.id
+            const order = await orderModel.create({isopen:true,userid:userid})
+            orderId = order.id as number;
+        }
         const quantity = req.body.quantity;
-        const productId = req.body.product_id;
+        const productId = req.body.productId;
         const result = await orderModel.addProduct({
           orderId,
           quantity,
@@ -148,6 +159,27 @@ export const ordersRouts = (app: express.Application) => {
         res.json({
           status: "success",
           message: "done add product to order",
+          data: result,
+        });
+      } catch (error) {
+        next(error);
+      }
+    }
+  );
+
+  app.get(
+    "orders/:id/products",
+    async (
+      req: express.Request,
+      res: express.Response,
+      next: NextFunction
+    ): Promise<void> => {
+      try {
+        const id = parseInt(req.params.id);
+        const result = await orderModel.getProductsByOrder(id);
+        res.json({
+          status: "success",
+          message: "done all products for one order.",
           data: result,
         });
       } catch (error) {

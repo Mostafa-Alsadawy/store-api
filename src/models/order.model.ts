@@ -2,8 +2,8 @@ import client from "../database";
 
 export type Order = {
   id?: number;
-  stat: string;
-  userId: number;
+  isopen: boolean;
+  userid: number;
 };
 
 export type OrderProduct = {
@@ -62,13 +62,13 @@ export class OrderModel {
   }
 
   // create new order
-
   async create(order: Order): Promise<Order> {
     try {
       const connenction = await client.connect();
       const sql =
-        "INSERT INTO orders (stat,user_id) VALUES($1,$2) RETURNING *;";
-      const result = await connenction.query(sql, [order.stat, order.userId]);
+        "INSERT INTO orders (isopen,userid) VALUES($1,$2) RETURNING *;";
+
+      const result = await connenction.query(sql, [order.isopen, order.userid]);
       connenction.release();
       return result.rows[0];
     } catch (error) {
@@ -91,8 +91,8 @@ export class OrderModel {
       }
 
       const sql =
-        "UPDATE  orders SET (stat,user_id) VALUES($1,$2) RETURNING *;";
-      const result = await connenction.query(sql, [order.stat, order.userId]);
+        "UPDATE  orders SET (isopen,userid) = ($1,$2) RETURNING *;";
+      const result = await connenction.query(sql, [order.isopen, order.userid]);
       connenction.release();
       return result.rows[0];
     } catch (error) {
@@ -114,6 +114,29 @@ export class OrderModel {
       return result.rows[0];
     } catch (err) {
       throw new Error((err as Error).message);
+    }
+  }
+
+  //get all products on order
+  async getProductsByOrder(orderId: number): Promise<
+    {
+      name: string;
+      price: number;
+      quantity: number;
+    }[]
+  > {
+    try {
+      const sql =
+        "SELECT name,price,quantity FROM products INNER JOIN order_products WHERE order_id=$1;";
+      const connection = await client.connect();
+      const result = await connection.query(sql, [orderId]);
+      connection.release();
+      if (result.rowCount <= 0) {
+        throw new Error("there is no order exist with this id.");
+      }
+      return result.rows;
+    } catch (error) {
+      throw new Error((error as Error).message);
     }
   }
 }

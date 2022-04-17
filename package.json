@@ -5,9 +5,10 @@
   "main": "server.ts",
   "scripts": {
     "build": "npx tsc",
-    "start": "npm run build && node dist/server.js",
+    "start": "yarn run build && node dist/server.js",
     "watch": "tsc-watch --esModuleInterop src/server.ts --outDir ./dist --onSuccess \"node ./dist/server.js\"",
-    "test": "jasmine-ts",
+    "jasmine": "jasmine",
+    "test": "export NODE_ENV=test && db-migrate up --env test && yarn run build && jasmine && db-migrate --env test reset",
     "tsc": "tsc"
   },
   "author": "Udacity",

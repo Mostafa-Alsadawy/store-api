@@ -22,9 +22,10 @@ const errorThrower = ()=>{
     const authorizationHeader = req.headers.authorization;
     if (authorizationHeader) {
       const token = authorizationHeader.split(" ")[1];
-    //   const bearer = authorizationHeader.split(" ")[0];
       if (token) {
         const decoded = jwt.verify(token, process.env.TOKEN_SECRET as string);
+        //@ts-ignore
+        req.info = decoded;
         if (decoded) {
           next();
         } else {

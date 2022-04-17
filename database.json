@@ -1,5 +1,5 @@
 {
-    "defaultEnv":{"ENV":"MODE_ENV"},
+    "defaultEnv":{"ENV":"NODE_ENV"},
     "dev": {
       "driver": "pg",
       "host": {"ENV":"HOST"},

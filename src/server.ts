@@ -5,13 +5,13 @@ import {ordersRouts} from "./handlers/order.handler";
 import {productsRouts} from "./handlers/product.handler";
 
 
-const app: express.Application = express();
-const address: string = "0.0.0.0:3000";
+export const app: express.Application = express();
+export const port: number = 3000;
 
 app.use(bodyParser.json());
 
 app.get("/",async function (req: Request, res: Response) {
-  res.json("hello");
+  res.json("welcom to store api start by creating new user");
 });
 
 usersRoutes(app);
@@ -20,7 +20,7 @@ ordersRouts(app);
 
 
 app.listen(3000, function (): void {
-  console.log("server is running on " + address);
+  console.log("server is running on port " + port);
 });
 
 
@@ -35,3 +35,10 @@ app.use(
     res.status(status).json(err.message);
   }
 );
+
+app.use((_req:express.Request,res:express.Response)=>{
+  res.status(404).json({
+    status:"falid",
+    messsage:"we can't found that request."
+  });
+})
