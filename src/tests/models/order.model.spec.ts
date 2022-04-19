@@ -84,13 +84,16 @@ describe("Test functionality of all CRUD opreation for orde Model",()=>{
     expect(updatedOrder.userid).toEqual(update.userid);
   });
 
-  it("delete user by  id ",async():Promise<void>=>{
+
+  it("delete order by  id ",async():Promise<void>=>{
     const ordersCountBefore = (await orderModel.index()).length;
     const deletedOrder = await orderModel.delete(order.id!);
     const ordersCountAfter = (await orderModel.index()).length;
     expect(ordersCountAfter).toBe(ordersCountBefore - 1);
     expect(deletedOrder.id).toBe(order.id)
   });
+
+
 
  afterAll(async():Promise<void>=>{
    const connection = await client.connect();

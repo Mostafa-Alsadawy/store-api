@@ -38,7 +38,9 @@ const errorThrower = ()=>{
       errorThrower();
     }
   } catch (error) {
-    throw new Error((error as Error).message);
+    const err = new Error((error as Error).message);
+    err.name = "401";
+    throw err;
   }
 };
 

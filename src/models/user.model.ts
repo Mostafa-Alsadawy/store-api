@@ -92,7 +92,7 @@ export class UserModel {
         throw new Error("no such user exist");
       }
       const query =
-        "UPDATE users SET (firstName,lastName,passwd) = ($1,$2,$3) WHERE id = $4 RETURNING *;";
+        "UPDATE users SET (firstname,lastname,passwd) = ($1,$2,$3) WHERE id = $4 RETURNING *;";
       const result = await connection.query(query, [
         user.firstname,
         user.lastname,
@@ -110,20 +110,18 @@ export class UserModel {
 
   // authenticate user
 
-  async authenticate(user: User): Promise<User | null> {
+  async authenticate(userid:number,passwd:string): Promise<User | null> {
     try {
       const connection = await client.connect();
       const sql = "SELECT passwd FROM users WHERE id=$1;";
-      const result = await connection.query(sql, [user.id]);
+      const result = await connection.query(sql, [userid]);
       connection.release();
-      if (
-        result.rowCount == 1 &&
-        bcrypt.compareSync(user.passwd + process.env.PEPPER, result.rows[0])
-      ) {
-        return user;
-      } else {
-        return null;
+      if (result.rowCount == 1){
+        if(bcrypt.compareSync(passwd + process.env.PEPPER, result.rows[0].passwd)){
+          return this.getUser(userid);
+        }
       }
+      return null;
     } catch (error) {
       throw new Error((error as Error).message);
     }

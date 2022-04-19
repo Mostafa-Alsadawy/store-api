@@ -1,6 +1,6 @@
 import { UserModel } from "../models/user.model";
 import express, { NextFunction } from "express";
-import { body, validationResult } from "express-validator";
+import {check, body, validationResult } from "express-validator";
 import jwt from "jsonwebtoken";
 import verifyAuthToken from "../middlewares/verify_auth_token";
 
@@ -55,9 +55,10 @@ export const usersRoutes = (app: express.Application): void => {
 
   app.post(
     "/users/add-user",
-    body("firstName").isLength({ min: 5 }),
-    body("lastName").isLength({ min: 5 }),
-    body("password").isLength({ min: 5 }),
+    check("firstname")
+    .isLength({ min: 3 }),
+    check("lastname").isLength({ min: 3 }),
+    check("passwd").isLength({ min: 5 }),
     async (
       req: express.Request,
       res: express.Response,
@@ -65,10 +66,7 @@ export const usersRoutes = (app: express.Application): void => {
     ): Promise<express.Response | void> => {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        return res.status(400).json({
-          status: "faild",
-          message: "bad request " + errors.toString(),
-        });
+        return res.status(400).json(errors.array());
       }
       try {
         const result = await userModel.create(req.body);
@@ -111,9 +109,9 @@ export const usersRoutes = (app: express.Application): void => {
   app.put(
     "/users/:id",
     verifyAuthToken,
-    body("firstName").isLength({ min: 5 }),
-    body("lastName").isLength({ min: 5 }),
-    body("password").isLength({ min: 5 }),
+    body("firstname").isLength({ min: 3 }),
+    body("lastname").isLength({ min: 3 }),
+    body("passwd").isLength({ min: 5 }),
     async (
       req: express.Request,
       res: express.Response,
@@ -138,11 +136,10 @@ export const usersRoutes = (app: express.Application): void => {
   );
 
   //authenticate user
-  app.get(
+  app.post(
     "/users/authenticate",
-    body("firstName").isLength({ min: 5 }),
-    body("lastName").isLength({ min: 5 }),
-    body("password").isLength({ min: 5 }),
+    body("id").isNumeric(),
+    body("passwd").isString(),
     async (
       req: express.Request,
       res: express.Response,
@@ -150,13 +147,12 @@ export const usersRoutes = (app: express.Application): void => {
     ): Promise<express.Response | void> => {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        return res.status(400).json({
-          status: "faild",
-          message: "bad request " + errors.toString(),
-        });
+        return res.status(400).json(errors.array());
       }
       try {
-        const result = await userModel.authenticate(req.body);
+        const id = parseInt( req.body.id);
+        const passwd = req.body.passwd as string;
+        const result = await userModel.authenticate(id,passwd);
         if (result) {
           const token = jwt.sign(result, process.env.TOKEN_SECRET as string);
           res.json({

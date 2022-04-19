@@ -68,7 +68,7 @@ export class ProductModel {
       try{
           const connection = await client.connect();
           //check if the product exists
-          const inDB = await connection.query("SELECT id from products WHERE id = $1;",[product.id]);
+          const inDB = await connection.query("SELECT * from products WHERE id=$1;",[product.id]);
           if (inDB.rowCount <=0) {throw new Error("this product does not exist");}
         
           const sql = "UPDATE products SET(name,price) = ($1,$2) WHERE id = $3 RETURNING *;";

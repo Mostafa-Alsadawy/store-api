@@ -106,6 +106,7 @@ export const productsRouts = (app: expres.Application): void => {
   app.put(
     "/products/update",
     verifyAuthToken,
+    body("id").isNumeric(),
     body("name").isString().isLength({ min: 3 }),
     body("price").isNumeric(),
     async (
@@ -117,7 +118,7 @@ export const productsRouts = (app: expres.Application): void => {
       if (!errors.isEmpty()) {
         return res.status(400).json({
           status: "faild",
-          message: "bad request " + errors.toString(),
+          message: errors.array(),
         });
       }
       try {

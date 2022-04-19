@@ -29,9 +29,10 @@ app.use(
     err: Error,
     _req: express.Request,
     res: express.Response,
-    next: NextFunction
+    _next: NextFunction
   ): void => {
-    const status = 500;
+    
+    let status = parseInt(err.name) || 500;
     res.status(status).json(err.message);
   }
 );
