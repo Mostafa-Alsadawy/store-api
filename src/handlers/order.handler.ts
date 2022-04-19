@@ -54,7 +54,7 @@ export const ordersRouts = (app: express.Application) => {
 
   // Route to create new order
   app.post(
-    "/orders/create",
+    "/orders/add-order",
     verifyAuthToken,
     async (
       req: express.Request,
@@ -113,73 +113,6 @@ export const ordersRouts = (app: express.Application) => {
         res.json({
           status: "success",
           message: "done delete one ordere with id " + id,
-          data: result,
-        });
-      } catch (error) {
-        next(error);
-      }
-    }
-  );
-
-  app.post(
-    "/orders/:id/product",
-    verifyAuthToken,
-    body("quantity").isNumeric(),
-    body("productId").isNumeric(),
-    async (
-      req: express.Request,
-      res: express.Response,
-      next: NextFunction
-    ): Promise<express.Response | void> => {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(400).json({
-          status: "faild",
-          message: "bad request " + errors.toString(),
-        });
-      }
-      try {
-        let orderId = parseInt(req.params.id);
-
-        const order = await orderModel.show(orderId)
-
-        if(!order){
-            //@ts-ignore: used to avoid making custom type for request.
-            const userid:number = req.info.id
-            const order = await orderModel.create({isopen:true,userid:userid})
-            orderId = order.id as number;
-        }
-        const quantity = req.body.quantity;
-        const productId = req.body.productId;
-        const result = await orderModel.addProduct({
-          orderId,
-          quantity,
-          productId,
-        });
-        res.json({
-          status: "success",
-          message: "done add product to order",
-          data: result,
-        });
-      } catch (error) {
-        next(error);
-      }
-    }
-  );
-
-  app.get(
-    "orders/:id/products",
-    async (
-      req: express.Request,
-      res: express.Response,
-      next: NextFunction
-    ): Promise<void> => {
-      try {
-        const id = parseInt(req.params.id);
-        const result = await orderModel.getProductsByOrder(id);
-        res.json({
-          status: "success",
-          message: "done all products for one order.",
           data: result,
         });
       } catch (error) {

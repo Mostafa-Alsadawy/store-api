@@ -26,13 +26,7 @@ describe("make sure that all orders CRUD function are defined",()=>{
     expect(orderModel.delete).toBeDefined();
   });
 
-  it("add product to order is defined",():void=>{
-    expect(orderModel.addProduct).toBeDefined();
-  });
-
-  it("get all products on order is defined",():void=>{
-    expect(orderModel.getProductsByOrder).toBeDefined();
-  });
+  
 
 });
 

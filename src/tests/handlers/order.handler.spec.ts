@@ -25,7 +25,7 @@ describe("test funcionality of orders handlers", () => {
 
   it("crate new order", async () => {
     const result = await req
-      .post("/orders/create")
+      .post("/orders/add-order")
       .send(order)
       .set("Authorization", `Bearer ${token}`);
     const createdOrder = result.body.data;
