@@ -35,3 +35,10 @@ to make sure that db-migrate cli works install it gloabaly
 make tables needed for this project on database use command :
 `db-migrate up`
 
+## commands
+### start server:
+`npm start` OR `yarn start`
+### test app:
+`npm run test` OR `yarn start`
+
+
