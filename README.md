@@ -8,7 +8,14 @@ This repo contains a basic Node and Express app for Storefront Backend api this 
 
 ### make databases for project
 to use this backend you need to create 2 databases one for production and secoed for testing
-use command `CREATE DATABASE [the name for database]`
+- create user for database:
+  `CREATE USER username WITH PASSWORD 'password';`
+- create tow databases:
+  `CREATE DATABASE store;`
+  `CREATE DATABASE store_test`
+- grant all privileges for user
+  `GRANT ALL PRIVILEGES ON store TO username;`
+  `GRANT ALL PRIVILEGES ON store_test TO username;`
 
 Your application must have the following files:
 ### Create .env file:
