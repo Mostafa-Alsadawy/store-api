@@ -41,4 +41,5 @@ make tables needed for this project on database use command :
 ### test app:
 `npm run test` OR `yarn start`
 
-
+## ports
+server port: 3000
