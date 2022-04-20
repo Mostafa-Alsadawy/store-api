@@ -4,13 +4,12 @@ import { Product } from "../../models/product.model";
 import { User } from "../../models/user.model";
 import client from "../../database";
 
-
-
 const req = supertest(app);
 
 describe("test funcionality of product handlers", () => {
   const product: Product = {
     name: "bag",
+    cat: "personal",
     price: 5000,
   };
   let token = "";
@@ -35,7 +34,7 @@ describe("test funcionality of product handlers", () => {
     expect(createdProduct.price).toBe(product.price);
   });
 
-  it("get all product -authenticated- ", async () => {
+  it("get all product", async () => {
     {
       const result = await (
         await req.get("/products").set("Authorization", `Bearer ${token}`)
@@ -66,6 +65,7 @@ describe("test funcionality of product handlers", () => {
     const updateInfo: Product = {
       id: product.id,
       name: "updated Bag",
+      cat: "fashion",
       price: 10000,
     };
     const result = await req
@@ -77,7 +77,16 @@ describe("test funcionality of product handlers", () => {
     expect(updatedProduct.price).toBe(updateInfo.price);
   });
 
-  it("delete user by id ", async () => {
+  it("get products by catagory", async () => {
+    const result = await (
+      await req
+        .get("/products/cat/fashion")
+        .set("Authorization", `Bearer ${token}`)
+    ).body;
+    expect(result.data.length).toBe(1);
+  });
+
+  it("delete product by id ", async () => {
     const result = await (
       await req
         .delete("/products/" + product.id)

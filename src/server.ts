@@ -3,6 +3,7 @@ import bodyParser from "body-parser";
 import {usersRoutes} from "./handlers/user.handler";
 import {ordersRouts} from "./handlers/order.handler";
 import {productsRouts} from "./handlers/product.handler";
+import { orderProductsServiceRouts } from "./handlers/orderProductsService.handler";
 
 
 export const app: express.Application = express();
@@ -17,7 +18,7 @@ app.get("/",async function (req: Request, res: Response) {
 usersRoutes(app);
 productsRouts(app);
 ordersRouts(app);
-
+orderProductsServiceRouts(app);
 
 app.listen(3000, function (): void {
   console.log("server is running on port " + port);

@@ -35,20 +35,20 @@ describe("test funcionality of orders handlers", () => {
     order.id = orderFromDB.id;
     const productFromDB = await (
       await req
-        .post("/orders/add-product")
-        .send(order)
+        .post("/products/add-product")
+        .send(product)
         .set("Authorization", `Bearer ${token}`)
     ).body.data;
     product.id = productFromDB.id;
+
   });
 
   it("crate new product on order", async () => {
     const result = await req
-      .post("/orders/:id/product")
+      .post(`/orders/${order.id}/product`)
       .send({
-        order_id:order.id,
-        quantity:1,
-        product_id:product.id,
+        quantity: 1,
+        product_id: product.id,
       })
       .set("Authorization", `Bearer ${token}`);
     const createdProduct = result.body.data;
@@ -60,7 +60,9 @@ describe("test funcionality of orders handlers", () => {
   it("get all products on order -authenticated- ", async () => {
     {
       const result = await (
-        await req.get(`/orders/${order.id}/products`).set("Authorization", `Bearer ${token}`)
+        await req
+          .get(`/orders/${order.id}/products`)
+          .set("Authorization", `Bearer ${token}`)
       ).body;
       expect(result.data.length).toBe(1);
     }
@@ -72,23 +74,21 @@ describe("test funcionality of orders handlers", () => {
       expect(result.status).toBe(401);
     }
   });
- 
-    it("delete order products by id ", async () => {
-      const result = await (
-        await req
-          .delete(`orders/${order.id}/products/${product.id}` )
-          .set("Authorization", `Bearer ${token}`)
-      ).body;
-      expect(result.data.id).toBe(order.id);
-    });
 
-    afterAll(async () => {
-        const connection = await client.connect();
-        const sql =
-          "DELETE FROM orders;ALTER SEQUENCE orders_id_seq RESTART WITH 1;DELETE FROM users;ALTER SEQUENCE users_id_seq RESTART WITH 1;DELETE FROM products;ALTER SEQUENCE products_id_seq RESTART WITH 1;DELETE FROM order_products;ALTER SEQUENCE order_products_id_seq RESTART WITH 1;";
-        connection.query(sql);
-        connection.release();
-    });
+  it("delete order products by id ", async () => {
+    const result = await (
+      await req
+        .delete(`/orders/${order.id}/products/${product.id}`)
+        .set("Authorization", `Bearer ${token}`)
+    ).body;
+    expect(result.data.id).toBe(order.id);
   });
 
-  
+  afterAll(async () => {
+    const connection = await client.connect();
+    const sql =
+      "DELETE FROM orders;ALTER SEQUENCE orders_id_seq RESTART WITH 1;DELETE FROM users;ALTER SEQUENCE users_id_seq RESTART WITH 1;DELETE FROM products;ALTER SEQUENCE products_id_seq RESTART WITH 1;TRUNCATE order_products RESTART IDENTITY;";
+          connection.query(sql);
+    connection.release();
+  });
+});

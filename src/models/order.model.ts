@@ -71,17 +71,18 @@ export class OrderModel {
   }
   // update an existing order (open or closed)
 
-  async update(order: Order): Promise<Order> {
+  async compelet(orderid:number,orderStat:boolean): Promise<Order> {
     try {
       const connenction = await client.connect();
 
-      //check if the product exists
+      // check if the product exists
       const inDB = await connenction.query(
         "SELECT id from orders WHERE id = $1;",
-        [order.id]);
+        [orderid]);
+        if(inDB.rowCount <= 0){throw new Error("this order does not exist.")}
       const sql =
-        "UPDATE  orders SET (isopen,userid) = ($1,$2) RETURNING *;";
-      const result = await connenction.query(sql, [order.isopen, order.userid]);
+        "UPDATE  orders SET isopen = $1 WHERE id = $2 RETURNING *;";
+      const result = await connenction.query(sql, [orderStat,orderid]);
       connenction.release();
       return result.rows[0];
     } catch (error) {

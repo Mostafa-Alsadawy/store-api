@@ -2,6 +2,7 @@ import client from "../database";
 export type Product = {
   id?: number;
   name: string;
+  cat?: string;
   price: number;
 };
 
@@ -27,7 +28,9 @@ export class ProductModel {
       const sql = "SELECT * FROM products WHERE id = $1;";
       const result = await connection.query(sql, [productId]);
       connection.release();
-      if(result.rowCount <= 0){throw new Error("this product does not exist.");}
+      if (result.rowCount <= 0) {
+        throw new Error("this product does not exist.");
+      }
       return result.rows[0];
     } catch (err) {
       throw new Error((err as Error).message);
@@ -42,7 +45,9 @@ export class ProductModel {
       const sql = "DELETE FROM products WHERE id=$1 RETURNING *;";
       const result = await connection.query(sql, [productId]);
       connection.release();
-      if(result.rowCount <= 0){throw new Error("this product does not exist.");}
+      if (result.rowCount <= 0) {
+        throw new Error("this product does not exist.");
+      }
       return result.rows[0];
     } catch (err) {
       throw new Error((err as Error).message);
@@ -52,10 +57,19 @@ export class ProductModel {
   // create propduct
   async create(product: Product): Promise<Product> {
     try {
+      const isCatProvided = product.cat != undefined;
       const connection = await client.connect();
       const sql =
-        "INSERT  INTO products (name,price) VALUES ($1,$2) RETURNING *;";
-      const result = await connection.query(sql,[product.name,product.price]);
+        "INSERT  INTO products (name,price" +
+        (isCatProvided ? ",cat" : "") +
+        ") VALUES ($1,$2" +
+        (isCatProvided ? ",$3" : "") +
+        ") RETURNING *;";
+      const queryArr = [product.name, product.price];
+      if (isCatProvided) {
+        queryArr.push(product.cat as string);
+      }
+      const result = await connection.query(sql, queryArr);
       connection.release();
       return result.rows[0];
     } catch (err) {
@@ -63,21 +77,50 @@ export class ProductModel {
     }
   }
 
-  // update product 
-  async update(product:Product):Promise<Product>{
-      try{
-          const connection = await client.connect();
-          //check if the product exists
-          const inDB = await connection.query("SELECT * from products WHERE id=$1;",[product.id]);
-          if (inDB.rowCount <=0) {throw new Error("this product does not exist");}
-        
-          const sql = "UPDATE products SET(name,price) = ($1,$2) WHERE id = $3 RETURNING *;";
-          const result = await connection.query(sql,[product.name,product.price,product.id]);
-          return result.rows[0];
-        }
-
-      catch(err){
-        throw  new Error((err as Error).message);
+  // update product
+  async update(product: Product): Promise<Product> {
+    try {
+      const isCatProvided = product.cat != undefined;
+      const connection = await client.connect();
+      //check if the product exists
+      const inDB = await connection.query(
+        "SELECT * from products WHERE id=$1;",
+        [product.id]
+      );
+      if (inDB.rowCount <= 0) {
+        throw new Error("this product does not exist");
       }
+
+      const sql =
+        "UPDATE products SET(name,price" +
+        (isCatProvided ? ",cat" : "") +
+        ") = ($1,$2" +
+        (isCatProvided ? ",$3" : "") +
+        ") WHERE id = " +
+        product.id +
+        " RETURNING *;";
+      const queryArr = [product.name, product.price];
+      if (isCatProvided) {
+        queryArr.push(product.cat as string);
+      }
+      const result = await connection.query(sql,queryArr);
+      return result.rows[0];
+    } catch (err) {
+      throw new Error((err as Error).message);
+    }
   }
+
+  // get products by catgory 
+  async getProductsByCat(cat: string):Promise<Product[]> {
+    try {
+      const connection = await client.connect();
+      const sql = "SELECT * FROM products WHERE cat = $1;";
+      const result = await connection.query(sql, [cat]);
+      connection.release();
+      return result.rows;
+    } catch (err) {
+      throw new Error((err as Error).message);
+    }
+  }
+
 }

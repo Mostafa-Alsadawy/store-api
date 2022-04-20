@@ -1,17 +1,19 @@
-import expres, { NextFunction } from "express";
+import express, { NextFunction } from "express";
 import { ProductModel} from "../models/product.model";
 import { body, validationResult } from "express-validator";
 import verifyAuthToken from "../middlewares/verify_auth_token";
+import ProductsOrderService from "../services/productsOrderSrevices";
 
 const productModel = new ProductModel();
+const service = new ProductsOrderService();
 
-export const productsRouts = (app: expres.Application): void => {
+export const productsRouts = (app: express.Application): void => {
   // get all product route (index)
   app.get(
     "/products",
     async (
-      _req: expres.Request,
-      res: expres.Response,
+      _req: express.Request,
+      res: express.Response,
       next: NextFunction
     ): Promise<void> => {
       try {
@@ -30,8 +32,8 @@ export const productsRouts = (app: expres.Application): void => {
   app.get(
     "/products/:id",
     async (
-      req: expres.Request,
-      res: expres.Response,
+      req: express.Request,
+      res: express.Response,
       next: NextFunction
     ): Promise<void> => {
       try {
@@ -53,8 +55,8 @@ export const productsRouts = (app: expres.Application): void => {
     "/products/:id",
     verifyAuthToken,
     async (
-      req: expres.Request,
-      res: expres.Response,
+      req: express.Request,
+      res: express.Response,
       next: NextFunction
     ): Promise<void> => {
       try {
@@ -77,11 +79,12 @@ export const productsRouts = (app: expres.Application): void => {
     verifyAuthToken,
     body("name").isString().isLength({ min: 3 }),
     body("price").isNumeric(),
+    body("cat").optional().isString(),
     async (
-      req: expres.Request,
-      res: expres.Response,
+      req: express.Request,
+      res: express.Response,
       next: NextFunction
-    ): Promise<expres.Response | void> => {
+    ): Promise<express.Response | void> => {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return res.status(400).json({
@@ -109,11 +112,12 @@ export const productsRouts = (app: expres.Application): void => {
     body("id").isNumeric(),
     body("name").isString().isLength({ min: 3 }),
     body("price").isNumeric(),
+    body("cat").optional().isString(),
     async (
-      req: expres.Request,
-      res: expres.Response,
+      req: express.Request,
+      res: express.Response,
       next: NextFunction
-    ): Promise<expres.Response | void> => {
+    ): Promise<express.Response | void> => {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return res.status(400).json({
@@ -133,4 +137,27 @@ export const productsRouts = (app: expres.Application): void => {
       }
     }
   );
+
+  // get all products with in same catagory
+
+  app.get("/products/cat/:cat",async (
+    req: express.Request,
+    res: express.Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const cat = req.params.cat;
+      console.log(cat);
+      const result = await productModel.getProductsByCat(cat);
+      res.json({
+        status: "success",
+        message: "done get product with catagory " + cat,
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  })
+
+  
 };

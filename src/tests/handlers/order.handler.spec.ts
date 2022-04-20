@@ -68,14 +68,12 @@ describe("test funcionality of orders handlers", () => {
       userid: order.userid,
     };
     const result = await req
-      .put("/orders/update")
-      .send(updateInfo)
+      .put(`/orders/${order.id}/complete`)
       .set("Authorization", `Bearer ${token}`);
     const updatedOrder = result.body.data;
     expect(updatedOrder.isopen).toBe(updateInfo.isopen);
-    expect(updatedOrder.userid).toBe(updateInfo.userid);
-  });
 
+  });
   it("delete user by id ", async () => {
     const result = await (
       await req

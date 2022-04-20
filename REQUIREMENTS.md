@@ -19,7 +19,6 @@ These are the notes from a meeting with the frontend developer that describe wha
 
 #### Users
 - Index [token required]
-
 - Show [token required]
 - Create N[token required]
 

@@ -1,4 +1,5 @@
 import client from "../database";
+import { Product } from "../models/product.model";
 
 export type OrderProduct = {
   id?: number;
@@ -64,6 +65,20 @@ class ProductsOrderService {
       throw new Error((error as Error).message);
     }
   }
+
+  // get top 5 products
+  async getTopFiveProducts():Promise<Product[]>{
+    try{
+      const sql = "SELECT id,name FROM products INNER JOIN order_products ON products.id = order_products.product_id ORDER BY quantity DESC LIMIT 5;";
+      const connection = await client.connect();
+      const result = await connection.query(sql);
+      return result.rows;
+    }catch(err){
+      throw new Error((err as Error).message);
+    }
+  }
+
+  
 }
 
 export default ProductsOrderService;

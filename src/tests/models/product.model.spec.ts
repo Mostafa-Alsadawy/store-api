@@ -29,6 +29,12 @@ describe("make sure that all product CRUD function are defined",()=>{
 describe("Test functionality of all CRUD opreation for Product Model",()=>{
   const product:Product = {
     name:"test-product",
+    cat:"test",
+    price:10,
+  }
+  const product2:Product = {
+    name:"test-product2",
+    cat:"test2",
     price:10,
   }
   it("create new product",async():Promise<void>=>{
@@ -65,7 +71,16 @@ describe("Test functionality of all CRUD opreation for Product Model",()=>{
     expect(updatedProduct.price).toEqual(updatedInfo.price);
   });
 
-  it("delete user by  id ",async():Promise<void>=>{
+  it("gets product bt catgory",async():Promise<void>=>{
+    const testCat = await productModel.getProductsByCat("test");
+    await productModel.create(product2);
+    const test2Cat = await productModel.getProductsByCat("test2");
+    expect(testCat.length).toBe(1);
+    expect(testCat[0].id).toBe(product.id);
+    expect(test2Cat.length).toBe(1);
+    expect(test2Cat[0].name).toBe("test-product2");
+  })
+  it("delete product by  id ",async():Promise<void>=>{
     const productCountBefore = (await productModel.index()).length;
     const deletedProduct = await productModel.delete(product.id!);
     const productCountAfter = (await productModel.index()).length;

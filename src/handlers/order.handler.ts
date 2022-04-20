@@ -78,7 +78,7 @@ export const ordersRouts = (app: express.Application) => {
   // Route to update order
 
   app.put(
-    "/orders/update",
+    "/orders/:id/complete",
     verifyAuthToken,
     async (
       req: express.Request,
@@ -86,10 +86,12 @@ export const ordersRouts = (app: express.Application) => {
       next: NextFunction
     ): Promise<void> => {
       try {
-        const result = await orderModel.update(req.body);
+        const orderid = parseInt(req.params.id);
+        const result = await orderModel.compelet(orderid,false);
         res.json({
           status: "success",
-          message: "done update one ordere with id " + req.body.id,
+          message: "done update one ordere with id " + req.params.id,
+
           data: result,
         });
       } catch (error) {

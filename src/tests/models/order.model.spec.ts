@@ -19,7 +19,7 @@ describe("make sure that all orders CRUD function are defined",()=>{
   });
 
   it("update order is defined",():void=>{
-    expect(orderModel.update).toBeDefined();
+    expect(orderModel.compelet).toBeDefined();
   });
 
   it("delete order is defined",():void=>{
@@ -66,16 +66,15 @@ describe("Test functionality of all CRUD opreation for orde Model",()=>{
  
   });
 
-  it("update order ",async():Promise<void>=>{
+  it("compelet an order ",async():Promise<void>=>{
     let update:Order = {
       isopen:false,
       userid:order.userid,
     }
     const oldOrder = await orderModel.show(order.id!);
     update.id = oldOrder.id;
-    const updatedOrder = await orderModel.update(update);
+    const updatedOrder = await orderModel.compelet(update.id as number,update.isopen);
     expect(updatedOrder.isopen).toEqual(update.isopen);
-    expect(updatedOrder.userid).toEqual(update.userid);
   });
 
 
