@@ -8,6 +8,7 @@ const orderModel = new OrderModel();
 const service = new ProductsOrderService();
 
 export const orderProductsServiceRouts = (app: express.Application) => {
+  // add product  on specific order.
   app.post(
     "/orders/:id/product",
     verifyAuthToken,
@@ -18,6 +19,7 @@ export const orderProductsServiceRouts = (app: express.Application) => {
       res: express.Response,
       next: NextFunction
     ): Promise<express.Response | void> => {
+      // validate requset - check errors 
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return res.status(400).json(errors.array());
@@ -52,6 +54,8 @@ export const orderProductsServiceRouts = (app: express.Application) => {
       }
     }
   );
+
+// get all products on specific order
   app.get(
     "/orders/:id/products",
     verifyAuthToken,
@@ -74,6 +78,8 @@ export const orderProductsServiceRouts = (app: express.Application) => {
     }
   );
 
+  // delete product form order
+
   app.delete(
     "/orders/:orderid/products/:productid",
     verifyAuthToken,
@@ -91,7 +97,7 @@ export const orderProductsServiceRouts = (app: express.Application) => {
         );
         res.json({
           status: "success",
-          message: "done all products for one order.",
+          message: "done delete one product for one order.",
           data: result,
         });
       } catch (error) {

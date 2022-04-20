@@ -56,11 +56,20 @@ export const ordersRouts = (app: express.Application) => {
   app.post(
     "/orders/add-order",
     verifyAuthToken,
+    body("isopen").isBoolean(),
+    body("userid").isNumeric(),
     async (
       req: express.Request,
       res: express.Response,
       next: NextFunction
-    ): Promise<void> => {
+    ): Promise<express.Response | void> => {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          status: "faild",
+          message: "bad request " + errors.toString(),
+        });
+      }
       try {
         
         const result = await orderModel.create(req.body);

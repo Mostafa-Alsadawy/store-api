@@ -2,10 +2,8 @@ import express, { NextFunction } from "express";
 import { ProductModel} from "../models/product.model";
 import { body, validationResult } from "express-validator";
 import verifyAuthToken from "../middlewares/verify_auth_token";
-import ProductsOrderService from "../services/productsOrderSrevices";
 
 const productModel = new ProductModel();
-const service = new ProductsOrderService();
 
 export const productsRouts = (app: express.Application): void => {
   // get all product route (index)
@@ -147,7 +145,6 @@ export const productsRouts = (app: express.Application): void => {
   ): Promise<void> => {
     try {
       const cat = req.params.cat;
-      console.log(cat);
       const result = await productModel.getProductsByCat(cat);
       res.json({
         status: "success",

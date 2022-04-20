@@ -7,6 +7,7 @@ import verifyAuthToken from "../middlewares/verify_auth_token";
 const userModel = new UserModel();
 
 export const usersRoutes = (app: express.Application): void => {
+  // get all users 
   app.get(
     "/users",
     verifyAuthToken,
@@ -18,7 +19,7 @@ export const usersRoutes = (app: express.Application): void => {
       try {
         const result = await userModel.index();
         res.json({
-          status: 200,
+          status: "success",
           message: "get all users done",
           data: result,
         });
@@ -28,6 +29,7 @@ export const usersRoutes = (app: express.Application): void => {
     }
   );
 
+  // get specific user using its id.
   app.get(
     "/users/:id",
     verifyAuthToken,
@@ -43,8 +45,8 @@ export const usersRoutes = (app: express.Application): void => {
           throw new Error("this item does not exist.");
         }
         res.json({
-          status: 200,
-          message: "done",
+          status: "success",
+          message: "done getting user with id "+id,
           data: result,
         });
       } catch (error) {
@@ -53,6 +55,7 @@ export const usersRoutes = (app: express.Application): void => {
     }
   );
 
+  // create new user
   app.post(
     "/users/add-user",
     check("firstname")
@@ -84,6 +87,7 @@ export const usersRoutes = (app: express.Application): void => {
     }
   );
 
+  // delete existing user 
   app.delete(
     "/users/:id",
     verifyAuthToken,
@@ -96,8 +100,8 @@ export const usersRoutes = (app: express.Application): void => {
         const id = req.params.id as unknown as number;
         const result = await userModel.deleteUser(id);
         res.json({
-          status: 200,
-          message: "done",
+          status: "success",
+          message:"done delete user with id " + id,
           data: result,
         });
       } catch (error) {
@@ -106,6 +110,8 @@ export const usersRoutes = (app: express.Application): void => {
     }
   );
 
+
+// update user information 
   app.put(
     "/users/:id",
     verifyAuthToken,
@@ -128,14 +134,18 @@ export const usersRoutes = (app: express.Application): void => {
         const id = req.params.id;
         req.body.id = id;
         const result = await userModel.updateUser(req.body);
-        res.json(result);
+        res.json({
+          status: "success",
+          message: "done update user with id",
+          data: result
+        });
       } catch (error) {
         next(error);
       }
     }
   );
 
-  //authenticate user
+  //authenticate user return token for exists users.
   app.post(
     "/users/authenticate",
     body("id").isNumeric(),

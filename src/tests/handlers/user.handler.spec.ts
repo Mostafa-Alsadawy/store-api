@@ -80,7 +80,7 @@ describe("test funcionality of user handlers", () => {
         .send(info)
         .set("Authorization", `Bearer ${token}`)
     ).body;
-    const updatedUser = result;
+    const updatedUser = result.data;
     expect(updatedUser.firstname).toBe(info.firstname);
     expect(updatedUser.lastname).toBe(info.lastname);
     expect(await bcrypt.compare(user.passwd + env.PEPPER, updatedUser.passwd));
