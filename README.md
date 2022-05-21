@@ -50,3 +50,6 @@ make tables needed for this project on database use command :
 
 ## ports
 server port: 3000
+###NOTE:
+if you will use it on public you will need to forward port to 80
+,or use sudo command with start script (NOT RECOMMENDED).
